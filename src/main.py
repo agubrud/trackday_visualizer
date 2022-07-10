@@ -3,10 +3,13 @@ from calibrate import calibrate
 import cv2
 import matplotlib.pyplot as plt
 from proc import big_pipeline
+import os
 
 def main():
     mtx, dist = calibrate()
-
+    if not os.path.exists('./output_images/'):
+        os.makedirs('./output_images/')
+        os.makedirs('./output_images/examples')
     image = cv2.imread('./camera_cal/calibration1.jpg')
     undist = cv2.undistort(image, mtx, dist, None, mtx)
 
