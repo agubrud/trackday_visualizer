@@ -1,9 +1,11 @@
 import os
 import cv2
 import numpy as np
+import pickle as pkl
+import glob
 
-def calibrate():# process calibration images
-    img_list =os.listdir("./camera_cal/")
+def _calibrate(**kwargs):# process calibration images
+    img_list =glob.glob(os.path.realpath(f"{kwargs.get('calibrationDir')}/*.jpg"))
 
     # objpoints are for the nx*ny grid
     # imgpoints are where the chessboard corners lie in the calibration image pixels
@@ -11,8 +13,8 @@ def calibrate():# process calibration images
     imgpoints = []
 
     # iterate through all of the calibration images
-    for i in range(len(img_list)):
-        image = cv2.imread('./camera_cal/' + img_list[i])
+    for img in img_list:
+        image = cv2.imread(img)
         
         # the number of inside corners in x
         nx = 9 
@@ -41,3 +43,12 @@ def calibrate():# process calibration images
     ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, image.shape[:-1], None, None)
 
     return mtx, dist
+
+# TODO: Better error handling
+def calibrate(**kwargs):
+    if kwargs.get("calibrationMethod") == "pickle":
+        with open(kwargs.get('calibrationPkl'), 'rb') as handle:
+            cameraCalDict = pkl.load(handle)
+        return cameraCalDict.values()
+    else:
+        return _calibrate(calibrationDir=kwargs.get("calibrationDir"))    

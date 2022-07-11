@@ -42,26 +42,19 @@ def pipeline(img, s_thresh=(50, 255), l_thresh=(50,255)):
     # Threshold color channel
     s_binary = np.zeros_like(s_channel)
     
-    # udacity
-    #s_binary[((s_channel >= 90) & (l_channel >= 100)) | 
-    #         ((s_channel < 32) & (l_channel >= 0.85*max_l))] = 1
-    # track
-    s_binary[(l_channel >= 200)] = 1
+    s_binary[((s_channel >= 90) & (l_channel >= 100)) | 
+             ((s_channel < 32) & (l_channel >= 0.85*max_l))] = 1
+
     # if my HLS based thresholding can't find many lane line votes, fall back to sobel based approach
-    # udacity
     if np.sum(s_binary) <= 600:
         s_binary = np.zeros_like(s_channel)
         tmp_x = abs_sobel_thresh(equ, orient='x', sobel_kernel=15, thresh=(5, 255))
         s_binary = np.copy(tmp_x)
         s_binary = s_binary
-    # track
-    #s_binary = np.zeros_like(s_channel)
-    #tmp_x = abs_sobel_thresh(equ, orient='x', sobel_kernel=15, thresh=(0, 255))
-    #s_binary = np.copy(tmp_x)
-    #s_binary = s_binary
+    
     # get rid of any results in the lower middle part of the image. Helps with problems made by HOV marker    
-    #s_binary[gray.shape[0]-300:gray.shape[0], 
-    #                            int(gray.shape[1]/2)-150:int(gray.shape[1]/2)+150] = 0
+    s_binary[gray.shape[0]-300:gray.shape[0], 
+                                int(gray.shape[1]/2)-150:int(gray.shape[1]/2)+150] = 0
 
     color_binary = np.dstack(( s_binary, s_binary, s_binary))
 
@@ -341,22 +334,22 @@ def big_pipeline(img_fname, mtx, dist):
     image = mpimg.imread('./test_images/' + img_fname)
     
     # hard coded for udacity
-    # corners = np.float32(
-    #    [
-    #        [500, 500],
-    #        [780, 500],
-    #        [1130, 720],
-    #        [150, 720]               
-    #     ])
-    
-    # hard coded for track
     corners = np.float32(
         [
-            [0, 400],
-            [1280, 400],
-            [1280, 500],
-            [0, 500]               
+            [500, 500],
+            [780, 500],
+            [1130, 720],
+            [150, 720]               
          ])
+    
+    # hard coded for track
+    #corners = np.float32(
+    #    [
+    #        [0, 400],
+    #        [1280, 400],
+    #        [1280, 500],
+    #        [0, 500]               
+    #     ])
 
     # show the original image
     f, (ax1) = plt.subplots(1, 1, figsize=(24, 9))
