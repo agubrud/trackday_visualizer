@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from line import Line
+import os
 
 def abs_sobel_thresh(gray, orient='x', sobel_kernel=3, thresh=(0, 255)):
     # Calculate directional gradient
@@ -331,7 +332,7 @@ def calculate_lane_curvature(lefty, righty, leftx, rightx, ploty):
     return left_curverad, right_curverad
 
 def big_pipeline(img_fname, mtx, dist):
-    image = mpimg.imread('./test_images/' + img_fname)
+    image = mpimg.imread(os.path.realpath(img_fname))
     
     # hard coded for udacity
     corners = np.float32(
@@ -356,7 +357,7 @@ def big_pipeline(img_fname, mtx, dist):
     f.tight_layout()
     ax1.imshow(image)
     ax1.set_title('Original Image', fontsize=50)    
-    plt.imsave('output_images/examples/example_orig_' + img_fname, image)
+    plt.imsave('output_images/examples/example_orig_' + os.path.basename(img_fname), image)
     
     # undistort the image
     undist = cv2.undistort(image, mtx, dist, None, mtx)
@@ -366,7 +367,7 @@ def big_pipeline(img_fname, mtx, dist):
     f.tight_layout()
     ax1.imshow(undist)
     ax1.set_title('Undistorted Image', fontsize=50)
-    plt.imsave('output_images/examples/example_undist_' + img_fname, undist)
+    plt.imsave('output_images/examples/example_undist_' + os.path.basename(img_fname), undist)
 
     # show pespective transform input coordinates on top of undistorted image
     plt.figure(figsize=(16,16))
@@ -375,7 +376,7 @@ def big_pipeline(img_fname, mtx, dist):
     plt.plot(corners[1][0], corners[1][1], 'x')
     plt.plot(corners[2][0], corners[2][1], 'x')
     plt.plot(corners[3][0], corners[3][1], 'x')
-    plt.savefig('output_images/examples/example_perspective_corners_' + img_fname)
+    plt.savefig('output_images/examples/example_perspective_corners_' + os.path.basename(img_fname))
     
     # perspective transform
     top_down, perspective_M = corners_unwarp(undist, corners)
@@ -388,14 +389,14 @@ def big_pipeline(img_fname, mtx, dist):
     f.tight_layout()
     ax1.imshow(top_down)
     ax1.set_title('Undistorted and Warped Image', fontsize=50)
-    plt.imsave('output_images/examples/example_perspective_unwarped_' + img_fname, top_down)
+    plt.imsave('output_images/examples/example_perspective_unwarped_' + os.path.basename(img_fname), top_down)
     
     # show lane line votes
     f, (ax1) = plt.subplots(1, 1, figsize=(24, 12))
     f.tight_layout()
     ax1.imshow(binary_warped_stacked)
     ax1.set_title('Thresholding', fontsize=50)
-    plt.imsave('output_images/examples/example_thresholded_' + img_fname, binary_warped_stacked)
+    plt.imsave('output_images/examples/example_thresholded_' + os.path.basename(img_fname), binary_warped_stacked)
     
     binary_warped = binary_warped_stacked[:,:,0]
 
@@ -415,7 +416,7 @@ def big_pipeline(img_fname, mtx, dist):
     ax1.plot(right_fitx, ploty, color='yellow')
     plt.xlim(0, 1280)
     plt.ylim(720, 0)
-    plt.savefig('output_images/examples/example_lines_' + img_fname)
+    plt.savefig('output_images/examples/example_lines_' + os.path.basename(img_fname))
 
     # get the transform matrix to put the results back in the car camera's perspective
     replacement, Minv = corners_warp(result, corners)
@@ -472,6 +473,6 @@ def big_pipeline(img_fname, mtx, dist):
     ax1.plot(right_fitx+1280, ploty, color='yellow')
     #plt.xlim(1280, 2560)
     #plt.ylim(720, 0)
-    plt.savefig('output_images/' + img_fname)    
+    plt.savefig('output_images/' + os.path.basename(img_fname))    
     
     return result
