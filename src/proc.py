@@ -331,7 +331,8 @@ def calculate_lane_curvature(lefty, righty, leftx, rightx, ploty):
     
     return left_curverad, right_curverad
 
-def big_pipeline(img_fname, mtx, dist):
+def big_pipeline(mtx, dist, **kwargs):
+    img_fname = kwargs.get('inputImage')
     image = mpimg.imread(os.path.realpath(img_fname))
     
     # hard coded for udacity

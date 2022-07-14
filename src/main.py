@@ -13,7 +13,7 @@ def main():
 
     mtx, dist = calibrate(calibrationMethod=args.calibrationMethod, calibrationDir=args.calibrationDir, calibrationPkl=args.calibrationPkl)
 
-    big_pipeline(args.inputImage, mtx, dist)
+    big_pipeline(mtx, dist, inputImage=args.inputImage)
     return
 
 if __name__ == "__main__":
