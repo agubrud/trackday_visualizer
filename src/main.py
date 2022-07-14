@@ -13,7 +13,7 @@ def main():
 
     mtx, dist = calibrate(calibrationMethod=args.calibrationMethod, calibrationDir=args.calibrationDir, calibrationPkl=args.calibrationPkl)
 
-    big_pipeline(mtx, dist, inputImage=args.inputImage)
+    big_pipeline(mtx, dist, inputImage=args.inputImage, cornersJSON=args.cornersJSON)
     return
 
 if __name__ == "__main__":
@@ -22,5 +22,6 @@ if __name__ == "__main__":
     parser.add_argument("-cd", "--calibrationDir", required=False, default="./camera_cal/", help="Path to calibration images directory", dest="calibrationDir")
     parser.add_argument("-cp", "--calibrationPkl", required=False, default="./camera_cal/camera_cal.pkl", help="Path to precomputed calibration pickle", dest="calibrationPkl")
     parser.add_argument("-cm", "--calibrationMethod", required=False, default="pickle", choices=["directory", "pickle"], help="Mode to choose on-demand calibration or use preexisting pickle", dest="calibrationMethod")
+    parser.add_argument("-cj", "--cornersJSON", required=False, default="./corners_udacity.json", help="JSON file containing suggestion bounding box for where to find lane lines or road edge", dest="cornersJSON")
     args = parser.parse_args()
     main()

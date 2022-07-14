@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from line import Line
 import os
+import json
 
 def abs_sobel_thresh(gray, orient='x', sobel_kernel=3, thresh=(0, 255)):
     # Calculate directional gradient
@@ -335,14 +336,10 @@ def big_pipeline(mtx, dist, **kwargs):
     img_fname = kwargs.get('inputImage')
     image = mpimg.imread(os.path.realpath(img_fname))
     
-    # hard coded for udacity
-    corners = np.float32(
-        [
-            [500, 500],
-            [780, 500],
-            [1130, 720],
-            [150, 720]               
-         ])
+    with open(kwargs.get('cornersJSON'), 'r') as f:
+        corners = json.load(f)
+
+    corners = np.float32(corners)
     
     # hard coded for track
     #corners = np.float32(
