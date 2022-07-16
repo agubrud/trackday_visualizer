@@ -23,13 +23,15 @@ def abs_sobel_thresh(gray, orient='x', sobel_kernel=3, thresh=(0, 255)):
     sbinary[(scaled_sobel >= thresh[0]) & (scaled_sobel <= thresh[1])] = 1
     return sbinary
 
-def pipeline(img, s_thresh=(50, 255), l_thresh=(50,255)):
+def pipeline(img, **kwargs):
+    debug = kwargs.get("debug")
     gray = cv2.cvtColor(img,cv2.COLOR_RGB2GRAY)
 
     equ = cv2.equalizeHist(gray)
 
-    # show the histogram equalized image
-    save_image(equ, 'Histogram Equalized', 'output_images/examples/example_perspective_hist_eq.jpg')
+    if debug:
+        # show the histogram equalized image
+        save_image(equ, 'Histogram Equalized', 'output_images/examples/example_perspective_hist_eq.jpg')
 
     #img = cv2.cvtColor(equ,cv2.COLOR_GRAY2RGB)
     hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HLS).astype(np.float)
@@ -330,6 +332,7 @@ def calculate_lane_curvature(lefty, righty, leftx, rightx, ploty):
     return left_curverad, right_curverad
 
 def big_pipeline(mtx, dist, **kwargs):
+    debug = kwargs.get("debug")
     img_fname = kwargs.get('inputImage')
     image = mpimg.imread(os.path.realpath(img_fname))
     
@@ -338,29 +341,32 @@ def big_pipeline(mtx, dist, **kwargs):
 
     corners = np.float32(corners)
 
-    # show the original image
-    save_image(image, 'Original Image', 'output_images/examples/example_orig_' + os.path.basename(img_fname))
+    if debug:
+        # show the original image
+        save_image(image, 'Original Image', 'output_images/examples/example_orig_' + os.path.basename(img_fname))
     
     # undistort the image
     undist = cv2.undistort(image, mtx, dist, None, mtx)
 
-    # show undistorted image
-    save_image(undist, 'Undistorted Image', 'output_images/examples/example_undist_' + os.path.basename(img_fname))
+    if debug:
+        # show undistorted image
+        save_image(undist, 'Undistorted Image', 'output_images/examples/example_undist_' + os.path.basename(img_fname))
 
-    # show pespective transform input coordinates on top of undistorted image
-    save_corner_overlay(undist, 'output_images/examples/example_perspective_corners_' + os.path.basename(img_fname), corners)
+        # show pespective transform input coordinates on top of undistorted image
+        save_corner_overlay(undist, 'output_images/examples/example_perspective_corners_' + os.path.basename(img_fname), corners)
     
     # perspective transform
     top_down, perspective_M = corners_unwarp(undist, corners)
 
     # find the lane line votes
-    binary_warped_stacked = pipeline(top_down)    
+    binary_warped_stacked = pipeline(top_down, debug=debug)    
     
-    # show the perspective transform
-    save_image(top_down, 'Undistorted and Warped Image', 'output_images/examples/example_perspective_unwarped_' + os.path.basename(img_fname))
+    if debug:
+        # show the perspective transform
+        save_image(top_down, 'Undistorted and Warped Image', 'output_images/examples/example_perspective_unwarped_' + os.path.basename(img_fname))
     
-    # show lane line votes
-    save_image(binary_warped_stacked, 'Thresholding', 'output_images/examples/example_thresholded_' + os.path.basename(img_fname))
+        # show lane line votes
+        save_image(binary_warped_stacked, 'Thresholding', 'output_images/examples/example_thresholded_' + os.path.basename(img_fname))
     
     binary_warped = binary_warped_stacked[:,:,0]
 
@@ -372,7 +378,8 @@ def big_pipeline(mtx, dist, **kwargs):
     right_line = Line()
     left_fitx, right_fitx, lefty, righty, leftx, rightx, ploty, result = compute_lane_line_polynomials(top_down, binary_warped, undist, right_line, left_line)
   
-    save_figure(None, result, [left_fitx, right_fitx], ploty, 0, 'output_images/examples/example_lines_' + os.path.basename(img_fname))
+    if debug:
+        save_figure(None, result, [left_fitx, right_fitx], ploty, 0, 'output_images/examples/example_lines_' + os.path.basename(img_fname))
 
     # get the transform matrix to put the results back in the car camera's perspective
     replacement, Minv = corners_warp(result, corners)
