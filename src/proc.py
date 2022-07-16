@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
+from helper import save_figure
 from line import Line
 import os
 import json
@@ -28,11 +29,7 @@ def pipeline(img, s_thresh=(50, 255), l_thresh=(50,255)):
     equ = cv2.equalizeHist(gray)
 
     # show the histogram equalized image
-    f, (ax1) = plt.subplots(1, 1, figsize=(24, 12))
-    f.tight_layout()
-    ax1.imshow(gray)
-    ax1.set_title('Histogram Equalized', fontsize=50)
-    plt.imsave('output_images/examples/example_perspective_hist_eq.jpg', equ)
+    save_figure(equ, 'Histogram Equalized', 'output_images/examples/example_perspective_hist_eq.jpg')
 
     #img = cv2.cvtColor(equ,cv2.COLOR_GRAY2RGB)
     hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HLS).astype(np.float)
@@ -340,32 +337,15 @@ def big_pipeline(mtx, dist, **kwargs):
         corners = json.load(f)
 
     corners = np.float32(corners)
-    
-    # hard coded for track
-    #corners = np.float32(
-    #    [
-    #        [0, 400],
-    #        [1280, 400],
-    #        [1280, 500],
-    #        [0, 500]               
-    #     ])
 
     # show the original image
-    f, (ax1) = plt.subplots(1, 1, figsize=(24, 9))
-    f.tight_layout()
-    ax1.imshow(image)
-    ax1.set_title('Original Image', fontsize=50)    
-    plt.imsave('output_images/examples/example_orig_' + os.path.basename(img_fname), image)
+    save_figure(image, 'Original Image', 'output_images/examples/example_orig_' + os.path.basename(img_fname))
     
     # undistort the image
     undist = cv2.undistort(image, mtx, dist, None, mtx)
 
     # show undistorted image
-    f, (ax1) = plt.subplots(1, 1, figsize=(24, 9))
-    f.tight_layout()
-    ax1.imshow(undist)
-    ax1.set_title('Undistorted Image', fontsize=50)
-    plt.imsave('output_images/examples/example_undist_' + os.path.basename(img_fname), undist)
+    save_figure(undist, 'Undistorted Image', 'output_images/examples/example_undist_' + os.path.basename(img_fname))
 
     # show pespective transform input coordinates on top of undistorted image
     plt.figure(figsize=(16,16))
@@ -383,18 +363,10 @@ def big_pipeline(mtx, dist, **kwargs):
     binary_warped_stacked = pipeline(top_down)    
     
     # show the perspective transform
-    f, (ax1) = plt.subplots(1, 1, figsize=(24, 12))
-    f.tight_layout()
-    ax1.imshow(top_down)
-    ax1.set_title('Undistorted and Warped Image', fontsize=50)
-    plt.imsave('output_images/examples/example_perspective_unwarped_' + os.path.basename(img_fname), top_down)
+    save_figure(top_down, 'Undistorted and Warped Image', 'output_images/examples/example_perspective_unwarped_' + os.path.basename(img_fname))
     
     # show lane line votes
-    f, (ax1) = plt.subplots(1, 1, figsize=(24, 12))
-    f.tight_layout()
-    ax1.imshow(binary_warped_stacked)
-    ax1.set_title('Thresholding', fontsize=50)
-    plt.imsave('output_images/examples/example_thresholded_' + os.path.basename(img_fname), binary_warped_stacked)
+    save_figure(binary_warped_stacked, 'Thresholding', 'output_images/examples/example_thresholded_' + os.path.basename(img_fname))
     
     binary_warped = binary_warped_stacked[:,:,0]
 
@@ -451,8 +423,7 @@ def big_pipeline(mtx, dist, **kwargs):
     # calculate the car's offset from the lane center
     lane_midpoint = 0.5*(found_left+found_right)
     car_offset = lane_midpoint - result.shape[1]/2
-    car_offset_m = car_offset*3.7/1280 #meters per pixel in x direction
-               
+    car_offset_m = car_offset*3.7/1280 #meters per pixel in x direction               
     
     # Combine the result polygon with the original image
     result = cv2.addWeighted(undist, 1, newwarp, 0.3, 0)
@@ -469,8 +440,6 @@ def big_pipeline(mtx, dist, **kwargs):
     ax1.set_title('Resulting Image', fontsize=50)
     ax1.plot(left_fitx+1280, ploty, color='yellow')
     ax1.plot(right_fitx+1280, ploty, color='yellow')
-    #plt.xlim(1280, 2560)
-    #plt.ylim(720, 0)
     plt.savefig('output_images/' + os.path.basename(img_fname))    
     
     return result
