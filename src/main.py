@@ -23,6 +23,6 @@ if __name__ == "__main__":
     parser.add_argument("-cp", "--calibrationPkl", required=False, default="./camera_cal/camera_cal.pkl", help="Path to precomputed calibration pickle", dest="calibrationPkl")
     parser.add_argument("-cm", "--calibrationMethod", required=False, default="pickle", choices=["directory", "pickle"], help="Mode to choose on-demand calibration or use preexisting pickle", dest="calibrationMethod")
     parser.add_argument("-cj", "--cornersJSON", required=False, default="./corners_udacity.json", help="JSON file containing suggestion bounding box for where to find lane lines or road edge", dest="cornersJSON")
-    parser.add_argument("-d", "--debug", required=False, default=False, help="Application enters debug mode, saving intermediary figures", dest="debug")
+    parser.add_argument("-d", "--debug", required=False, default=False, action="store_true", help="Application enters debug mode, saving intermediary figures", dest="debug")
     args = parser.parse_args()
     main()
